@@ -12,12 +12,14 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { ChevronLeftIcon } from "react-native-heroicons/outline";
 import { HeartIcon } from "react-native-heroicons/solid";
 import MovieList from "../components/movieList";
+import { useNavigation } from "@react-navigation/native";
 
 var { width, height } = Dimensions.get("window");
 const ios = Platform.OS == "ios";
 const verticalMargin = ios ? "" : " my-3";
 
 export default function PersonScreen() {
+  const navigation = useNavigation();
   const [isFavourite, setIsFavourite] = useState(false);
   const [personMovies, setPersonMovies] = useState([1, 2, 3, 4, 5]);
   return (
@@ -116,7 +118,7 @@ export default function PersonScreen() {
           </Text>
         </View>
 
-        <MovieList title={'Movies'} hideSeeAll={true} data={personMovies} />
+        <MovieList title={"Movies"} hideSeeAll={true} data={personMovies} />
       </View>
     </ScrollView>
   );
