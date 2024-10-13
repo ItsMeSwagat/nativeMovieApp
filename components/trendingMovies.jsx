@@ -8,6 +8,7 @@ import {
 import Carousel from "react-native-reanimated-carousel";
 import React from "react";
 import { useNavigation } from "@react-navigation/native";
+import { img500 } from "../api/movieDB";
 
 const { width, height } = Dimensions.get("window");
 
@@ -42,7 +43,7 @@ const MovieCard = ({ item, handleClick }) => {
     <View className=" flex-1 justify-center items-center rounded-3xl overflow-hidden">
       <TouchableWithoutFeedback onPress={() => handleClick(item)}>
         <Image
-          source={require("../assets/poster1.jpg")}
+          source={{ uri: img500(item.poster_path) }}
           style={{ width: width, height: height }}
           className=" rounded-3xl overflow-hidden"
           resizeMode="contain"
