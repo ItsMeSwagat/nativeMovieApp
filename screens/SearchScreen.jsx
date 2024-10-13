@@ -12,13 +12,15 @@ import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { XMarkIcon } from "react-native-heroicons/outline";
 import { useNavigation } from "@react-navigation/native";
+import Loading from "../components/loading";
 
 var { width, height } = Dimensions.get("window");
 
 export default function SearchScreen() {
-  const [searchData, setSearchData] = useState([1,2,3]);
+  const [searchData, setSearchData] = useState([1, 2, 3]);
   const navigation = useNavigation();
   const movieName = "Harold and the purple Crayon";
+  const [loading, setLoading] = useState(false);
   return (
     <SafeAreaView className=" bg-neutral-900 flex-1">
       <View className=" mx-4 mt-5 mb-3 flex-row justify-between items-center border-2 border-neutral-500  rounded-full">
@@ -36,7 +38,9 @@ export default function SearchScreen() {
       </View>
 
       {/* Search Results */}
-      {searchData.length > 0 ? (
+      {loading ? (
+        <Loading />
+      ) : searchData.length > 0 ? (
         <ScrollView
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingHorizontal: 15 }}
@@ -51,7 +55,7 @@ export default function SearchScreen() {
                 <TouchableWithoutFeedback
                   key={i}
                   onPress={() => navigation.push("Movie", item)}
-                  className=''
+                  className=""
                 >
                   <View className=" space-y-3 mb-4">
                     <Image
