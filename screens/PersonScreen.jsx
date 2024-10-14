@@ -7,23 +7,49 @@ import {
   TouchableOpacity,
   Image,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ChevronLeftIcon } from "react-native-heroicons/outline";
 import { HeartIcon } from "react-native-heroicons/solid";
 import MovieList from "../components/movieList";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import Loading from "../components/loading";
+import { fetchCastDetails, fetchCastMovies, img342 } from "../api/movieDB";
 
 var { width, height } = Dimensions.get("window");
 const ios = Platform.OS == "ios";
 const verticalMargin = ios ? "" : " my-3";
 
 export default function PersonScreen() {
+  const { params: item } = useRoute();
   const navigation = useNavigation();
   const [isFavourite, setIsFavourite] = useState(false);
-  const [personMovies, setPersonMovies] = useState([1, 2, 3, 4, 5]);
+  const [personMovies, setPersonMovies] = useState([]);
+  const [cast, setCast] = useState({});
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    setLoading(true);
+    getCastDetails(item.id);
+    getCastMovies(item.id);
+  }, [item]);
+
+  const getCastDetails = async (id) => {
+    const data = await fetchCastDetails(id);
+    if (data) {
+      setCast(data);
+    }
+    setLoading(false);
+  };
+
+  const getCastMovies = async (id) => {
+    const data = await fetchCastMovies(id);
+    if (data && data.cast) {
+      setPersonMovies(data.cast);
+    }
+    setLoading(false);
+  };
+
   return (
     <ScrollView
       className=" flex-1 bg-neutral-900"
@@ -62,7 +88,7 @@ export default function PersonScreen() {
           >
             <View className=" rounded-full overflow-hidden h-72 w-72 border-2 border-neutral-400">
               <Image
-                source={require("../assets/cast1.webp")}
+                source={{ uri: img342(cast.profile_path) }}
                 style={{ width: width * 0.74, height: height * 0.43 }}
                 className=""
               />
@@ -71,10 +97,10 @@ export default function PersonScreen() {
 
           <View className=" mt-5">
             <Text className=" text-3xl text-white font-bold text-center">
-              Keanue Reeves
+              {cast?.name}
             </Text>
             <Text className=" text-center text-neutral-500 text-base">
-              London, United Kingdom
+              {cast?.place_of_birth}
             </Text>
           </View>
 
@@ -83,45 +109,40 @@ export default function PersonScreen() {
               <Text className=" font-semibold text-base text-white">
                 Gender
               </Text>
-              <Text className=" text-neutral-300 text-sm">Male</Text>
+              <Text className=" text-neutral-300 text-sm">
+                {cast?.gender == 1 ? "Female" : "Male"}
+              </Text>
             </View>
             <View className=" items-center border-r-2 border-neutral-400 px-2">
               <Text className=" font-semibold text-base text-white">
                 Birthday
               </Text>
-              <Text className=" text-neutral-300 text-sm">1964-09-02</Text>
+              <Text className=" text-neutral-300 text-sm">
+                {cast?.birthday}
+              </Text>
             </View>
             <View className=" items-center border-r-2 border-neutral-400 px-2">
               <Text className=" font-semibold text-base text-white">
                 Known For
               </Text>
-              <Text className=" text-neutral-300 text-sm">Acting</Text>
+              <Text className=" text-neutral-300 text-sm">
+                {cast?.known_for_department}
+              </Text>
             </View>
             <View className=" items-center px-2">
               <Text className=" font-semibold text-base text-white">
                 Popularity
               </Text>
-              <Text className=" text-neutral-300 text-sm">72.63%</Text>
+              <Text className=" text-neutral-300 text-sm">
+                {cast?.popularity?.toFixed(2)}%
+              </Text>
             </View>
           </View>
 
           <View className=" my-6 mx-4 space-y-2">
             <Text className=" text-white text-lg font-semibold">Biography</Text>
             <Text className=" text-neutral-400 text-justify tracking-wide">
-              Zachary Levi Pugh (/ˈzækəri ˈliːvaɪ/; born September 29, 1980) is
-              an American actor, comedian, and singer. He received critical
-              acclaim for starring as Chuck Bartowski in the series Chuck, and
-              as the title character in Shazam! and its 2022 sequel, as a part
-              of the DC Extended Universe. He voiced Eugene Fitzherbert in the
-              2010 animated film Tangled, where he performed "I See the Light"
-              with Mandy Moore; the song won a Grammy Award for Best Song
-              Written for Visual Media. He reprised the voice role in the 2012
-              short film Tangled Ever After and in 2017, Rapunzel's Tangled
-              Adventure, a Disney Channel television series based on the film.
-              He has appeared in the Marvel Cinematic Universe films Thor: The
-              Dark World and Thor: Ragnarok as Fandral. Levi starred as Georg
-              Nowack in the 2016 Broadway revival of She Loves Me opposite Laura
-              Benanti, for which he received a Tony Award nomination.
+              {cast?.biography || "N/A"}
             </Text>
           </View>
 
