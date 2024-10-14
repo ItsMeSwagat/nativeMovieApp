@@ -12,6 +12,10 @@ const movieCreditsAPI = (id) =>
   `${apiBaseURL}/movie/${id}/credits?api_key=${apiKey}`;
 const movieSimilarAPI = (id) =>
   `${apiBaseURL}/movie/${id}/similar?api_key=${apiKey}`;
+const castDetailsAPI = (id) => `${apiBaseURL}/person/${id}?api_key=${apiKey}`;
+const castMoviesAPI = (id) =>
+  `${apiBaseURL}/person/${id}/movie_credits?api_key=${apiKey}`;
+const searchMovieAPI = `${apiBaseURL}/search/movie?api_key=${apiKey}`;
 
 export const img500 = (path) =>
   path ? `https://image.tmdb.org/t/p/w500${path}` : null;
@@ -23,7 +27,8 @@ export const img185 = (path) =>
   path ? `https://image.tmdb.org/t/p/w185${path}` : null;
 
 export const fallbackMoviePoster = "";
-export const fallbackCastImg = "https://img.freepik.com/premium-vector/black-silhouette-default-profile-avatar_664995-354.jpg";
+export const fallbackCastImg =
+  "https://img.freepik.com/premium-vector/black-silhouette-default-profile-avatar_664995-354.jpg";
 
 const apiCall = async (endpoint, params) => {
   const options = {
@@ -63,4 +68,16 @@ export const fetchMovieCredits = (id) => {
 
 export const fetchSimilarMovies = (id) => {
   return apiCall(movieSimilarAPI(id));
+};
+
+export const fetchCastDetails = (id) => {
+  return apiCall(castDetailsAPI(id));
+};
+
+export const fetchCastMovies = (id) => {
+  return apiCall(castMoviesAPI(id));
+};
+
+export const fetchSearchMovies = (params) => {
+  return apiCall(searchMovieAPI, params);
 };
