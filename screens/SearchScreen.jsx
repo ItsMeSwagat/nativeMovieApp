@@ -8,23 +8,49 @@ import {
   TouchableWithoutFeedback,
   Image,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { XMarkIcon } from "react-native-heroicons/outline";
 import { useNavigation } from "@react-navigation/native";
 import Loading from "../components/loading";
+import { debounce, set } from "lodash";
+import { fetchSearchMovies, img185 } from "../api/movieDB";
 
 var { width, height } = Dimensions.get("window");
 
 export default function SearchScreen() {
-  const [searchData, setSearchData] = useState([1, 2, 3]);
+  const [searchData, setSearchData] = useState([]);
   const navigation = useNavigation();
   const movieName = "Harold and the purple Crayon";
   const [loading, setLoading] = useState(false);
+
+  const handleSearch = (value) => {
+    if (value && value.length > 2) {
+      setLoading(true);
+      fetchSearchMovies({
+        query: value,
+        include_adult: "true",
+        language: "em-US",
+        page: "1",
+      }).then((data) => {
+        setLoading(false);
+        if (data && data.results) {
+          setSearchData(data.results);
+        }
+      });
+    } else {
+      setLoading(false);
+      setSearchData([]);
+    }
+  };
+
+  const handleTextDebounce = useCallback(debounce(handleSearch, 500), []);
+
   return (
     <SafeAreaView className=" bg-neutral-900 flex-1">
       <View className=" mx-4 mt-5 mb-3 flex-row justify-between items-center border-2 border-neutral-500  rounded-full">
         <TextInput
+          onChangeText={handleTextDebounce}
           placeholder="Search Movie"
           placeholderTextColor={"lightgray"}
           className=" p-3 flex-1 font-semibold text-base text-white tracking-wider"
@@ -59,14 +85,14 @@ export default function SearchScreen() {
                 >
                   <View className=" space-y-3 mb-4">
                     <Image
-                      source={require("../assets/poster1.jpg")}
+                      source={{ uri: img185(item?.poster_path) }}
                       style={{ width: width * 0.44, height: height * 0.3 }}
                       className=" rounded-3xl"
                     />
                     <Text className=" text-neutral-300 text-base ml-2">
-                      {movieName.length > 20
-                        ? movieName.slice(0, 20) + "...."
-                        : movieName}
+                      {item?.title.length > 20
+                        ? item?.title.slice(0, 20) + "...."
+                        : item?.title}
                     </Text>
                   </View>
                 </TouchableWithoutFeedback>
